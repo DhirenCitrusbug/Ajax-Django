@@ -1,0 +1,93 @@
+<script>
+    $("#btn-save").click(
+        function(){
+            output = "";
+            let name = $("#nameid").val();
+            let id = $("#studentid").val();
+            let email = $("#emailid").val();
+            let password = $("#passwordid").val();
+            let csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val()
+
+            console.log(name,email,password);
+            let data = {'id':id,'name':name,'email':email,'password':password,'csrfmiddlewaretoken':csrfmiddlewaretoken}
+
+            $.ajax({
+                url : "{% url 'save' %}",
+                method : "POST",
+                data : data,
+                success : function(data){
+                    if (data.status == 'saved'){
+                        console.log(data['student_data']);
+                        x = data['student_data'];
+                        for(i=0;i<x.length;i++){
+                            output += `<tr><td scope="col">` + x[i].id+`</td><td scope="col">`+ x[i].name+`</td><td scope="col">`+x[i].email+`</td><td scope="col">`+ x[i].password +`</td><td scope="col"><input type="submit" value="Edit" data-sid="`+ x[i].id+`" class="btn btn-edit btn-sm btn-info">
+                                <input type="submit" value="Delete" data-sid="`+ x[i].id+`" class="btn  btn-del btn-sm btn-danger"></td></tr>`
+                                
+                            }
+                            console.log(output)
+                            $("#tbody").html(output);
+                            $("form")[0].reset(); 
+                    }
+                    
+                }
+            })
+        }
+
+        )
+
+
+    // Delete 
+
+    $("tbody").on("click",".btn-del",function() {
+        let id = $(this).attr("data-sid");
+        console.log(id);
+        let csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val()
+        data = {id:id,csrfmiddlewaretoken:csrfmiddlewaretoken}
+        mythis = this
+        $.ajax({
+            url:"{% url 'delete' %}",
+            method:"POST",
+            data: data,
+            success:function(data){
+                console.log(data);
+            },
+            });
+
+            $(mythis).closest("tr").fadeOut();
+                
+        });
+  
+        // Edit 
+
+        $("tbody").on("click",".btn-edit",function() {
+        let id = $(this).attr("data-sid");
+        console.log(id);
+        let csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val()
+        data = {id:id,csrfmiddlewaretoken:csrfmiddlewaretoken}
+        mythis = this
+        $.ajax({
+            url:"{% url 'edit' %}",
+            method:"POST",
+            data: data,
+            success:function(data){
+                console.log(data);
+                $("#studentid").val(data['student_data']['id'])
+                $("#nameid").val(data['student_data']['name'])
+                $("#emailid").val(data['student_data']['email'])
+                $("#passwordid").val(data['student_data']['password'])
+            },
+            });
+
+        //     $(mythis).closest("tr").fadeOut();
+                
+        });
+   
+
+</script>
+
+<!-- <tr><td scope="col">1<td><td scope="col">Jack<td><td scope="col">jack@gmail.com<td><td scope="col">jack<td><td scope="col"><input type="submit" value="Edit" data-sid="1" class="btn btn-sm btn-info">
+    <input type="submit" value="Delete" data-sid="1" class="btn btn-sm btn-danger"></td></tr><tr><td scope="col">2<td><td scope="col">Rita<td><td scope="col">rita@gmail.com<td><td scope="col">rita<td><td scope="col"><input type="submit" value="Edit" data-sid="2" class="btn btn-sm btn-info">
+    <input type="submit" value="Delete" data-sid="2" class="btn btn-sm btn-danger"></td></tr><tr><td scope="col">3<td><td scope="col">Karl<td><td scope="col">karl@gmail.com<td><td scope="col">karl<td><td scope="col"><input type="submit" value="Edit" data-sid="3" class="btn btn-sm btn-info">
+    <input type="submit" value="Delete" data-sid="3" class="btn btn-sm btn-danger"></td></tr><tr><td scope="col">4<td><td scope="col"><td><td scope="col"><td><td scope="col"><td><td scope="col"><input type="submit" value="Edit" data-sid="4" class="btn btn-sm btn-info">
+    <input type="submit" value="Delete" data-sid="4" class="btn btn-sm btn-danger"></td></tr><tr><td scope="col">5<td><td scope="col">Patt<td><td scope="col">patt@gmail.com<td><td scope="col">patt<td><td scope="col"><input type="submit" value="Edit" data-sid="5" class="btn btn-sm btn-info">
+    <input type="submit" value="Delete" data-sid="5" class="btn btn-sm btn-danger"></td></tr> -->
